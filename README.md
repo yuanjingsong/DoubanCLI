@@ -14,7 +14,7 @@ Support : Mac OS X 10.12 && python 3.X (**need**)
 
 ************
 
-````````
+````````bash
 python3 setup.py
 chmod +x douban
 sudo cp douban /usr/local/bin/ 
@@ -30,7 +30,7 @@ sudo cp douban /usr/local/bin/
 
 
 
-```````
+```````bash
 $ douban 猩球崛起
 
 #######################################################
