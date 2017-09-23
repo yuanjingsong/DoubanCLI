@@ -7,11 +7,11 @@
     :Date  09/20/2017
     :author yuanjingsong
     :license: MIT
-    :copyright: Copyright (c) 2017 Yuanjingsong. All rights reserved
+    :copyright: Copyright (c) 2017 YuanJingsong. All rights reserved
     Usage:
-        douban -m <title>
-        douban -b <title>
-        douban -h
+        douban.py -m <title>
+        douban.py -b <title>
+        douban.py -H
 """
 import requests
 import json
@@ -28,18 +28,19 @@ __constact__ = "yuanjingsongxjtu@gmail.com"
 __license__ = "MIT"
 
 class Movie():
-    api = "http://api.douban.com/v2/movie/search?q="
+    Dou_api = "http://api.douban.com/v2/movie/search?q="
+    # Imdb_api = ""
     movie_detail_api = "http://api.douban.com/v2/movie/subject/"
     def __init__(self,argv):
         movie = ''
         if len(argv) > 0 :
             for s in argv:
                 movie = movie + s + ""
-            self.api = self.api + movie
+            self.Dou_api = self.Dou_api + movie
         self.search()
     def search(self):
         try:
-            query = requests.get(self.api).json()
+            query = requests.get(self.Dou_api).json()
             id = query['subjects'][0]['id']
             movie_detail = requests.get(self.movie_detail_api + id).json()
             print('\033[1;31m####################################################### \033[0m')
@@ -85,10 +86,33 @@ class Book():
             print('\033[1;31m####################################################### \033[0m')
         except Exception as e:
             print("search book wrong" + times)
+def Search_Hot():
+    api_url = "http://api.douban.com/v2/movie/in_theaters"
+    try:
+        hot_detail = requests.get(api_url).json()
+        hot_movies = hot_detail['subjects']
+        for i in hot_movies:
+            printMovie(i)
+    except Exception as e:
+        print(e)
+def printMovie(movie):
+    if(str(movie["rating"]["average"]) != "0"):
+        print('\033[1;31m####################################################### \033[0m')
+        print("影片:  " + movie["title"] + "\n")
+        print("评分:  " + str(movie["rating"]["average"]) + "\n")
+        print("类型:  ",end = "")
+        for i in movie['genres']:
+            print(i,end=" ")
+        print("\n")
+        print("链接:  " + movie['alt'] + "\n")
+        print('\033[1;31m####################################################### \033[0m')
+        print('\033[1;31m------------------------------------------------------- \033[0m')
 def main():
     arguments = docopt(__doc__)
     if(arguments['-m'] is True):
         Movie(arguments['<title>'])
     elif (arguments['-b'] is True):
         Book(arguments['<title>'])
+    elif (arguments['-H'] is True):
+        Search_Hot()
 main()
