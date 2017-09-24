@@ -29,8 +29,7 @@ __license__ = "MIT"
 
 class Movie():
     Dou_api = "http://api.douban.com/v2/movie/search?q="
-    # Imdb_api = ""
-    movie_detail_api = "http://api.douban.com/v2/movie/subject/"
+    Movie_detail_api = "http://api.douban.com/v2/movie/subject/"
     def __init__(self,argv):
         movie = ''
         if len(argv) > 0 :
@@ -42,18 +41,21 @@ class Movie():
         try:
             query = requests.get(self.Dou_api).json()
             id = query['subjects'][0]['id']
-            movie_detail = requests.get(self.movie_detail_api + id).json()
+            movie_detail = requests.get(self.Movie_detail_api + id).json()
             print('\033[1;31m####################################################### \033[0m')
             print("影片:  " + movie_detail["title"] + "\n")
             print("上映:  " + movie_detail['year'] + "\n")
-            print("类型:  " + movie_detail["genres"][0] + movie_detail['genres'][1] + "\n")
+            print("类型:  ",end = "")
+            printList(movie_detail['genres'])
+            print('\n')
             if(movie_detail.__contains__("duration")):
                 print("片长:  " + movie_detail['duration'] + "\n")
             print("豆瓣评分:  " +str(movie_detail['rating']['average']) + "\n")
+            searchImbd(movie_detail['original_title'],movie_detail['year'])
             print("简介:  " + movie_detail['summary'])
             print('\033[1;31m###################################################### \033[0m')
         except Exception as e:
-            print("search movie wrong")
+            print(e.message)
 class Book():
     api = "https://api.douban.com/v2/book/search?q="
     book_detail_api = "https://api.douban.com/v2/book/"
@@ -77,15 +79,18 @@ class Book():
             print('\033[1;31m####################################################### \033[0m')
             print("书籍:  " + book_detail['title'] + "\n")
             print("作者:  " + book_detail['author'][0] + "\n")
+            print("标签:  ",end="")
+            printDict(book_detail['tags'])
+            print("\n")
             print("出版社:  " + book_detail['publisher'] + "\n")
-            print("出版日期:  " + book_detail['pubdate'] + "\n")
+            # print("出版日期:  " + book_detail['pubdate'] + "\n")
             print("定价:  " + book_detail['price'] + "\n")
             print("豆瓣评分:  " + book_detail['rating']['average'] + "\n")
             print("作者简介:  " + book_detail['author_intro'] + "\n")
             print("概要:  " + book_detail['summary'] + "\n")
             print('\033[1;31m####################################################### \033[0m')
         except Exception as e:
-            print("search book wrong" + times)
+            print(e.message)
 def Search_Hot():
     api_url = "http://api.douban.com/v2/movie/in_theaters"
     try:
@@ -100,13 +105,27 @@ def printMovie(movie):
         print('\033[1;31m####################################################### \033[0m')
         print("影片:  " + movie["title"] + "\n")
         print("评分:  " + str(movie["rating"]["average"]) + "\n")
+        try:
+            searchImbd(movie['original_title'],movie['year'])
+        except Exception as e :
+            print("暂无评分\n")
         print("类型:  ",end = "")
-        for i in movie['genres']:
-            print(i,end=" ")
+        printList(movie['genres'])
         print("\n")
         print("链接:  " + movie['alt'] + "\n")
         print('\033[1;31m####################################################### \033[0m')
         print('\033[1;31m------------------------------------------------------- \033[0m')
+def printList(list):
+    for index in list:
+        print(index,end = " ")
+def printDict(dict):
+    for i in dict:
+        print(i["name"],end = " ")
+def searchImbd(title, year):
+    Imdb_api = "http://www.theimdbapi.org/api/find/movie"
+    Imdb_para = {"title": title, "year": year}
+    imdb_detail = requests.get(Imdb_api, params = Imdb_para).json()
+    print("Imdb评分:  " + imdb_detail[0]['rating'] + '\n')
 def main():
     arguments = docopt(__doc__)
     if(arguments['-m'] is True):
