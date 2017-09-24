@@ -51,7 +51,10 @@ class Movie():
             if(movie_detail.__contains__("duration")):
                 print("片长:  " + movie_detail['duration'] + "\n")
             print("豆瓣评分:  " +str(movie_detail['rating']['average']) + "\n")
-            searchImbd(movie_detail['original_title'],movie_detail['year'])
+            try:
+                searchImbd(movie['original_title'],movie['year'])
+            except Exception as e :
+                print("Imdb 暂无评分\n")
             print("简介:  " + movie_detail['summary'])
             print('\033[1;31m###################################################### \033[0m')
         except Exception as e:
@@ -108,7 +111,7 @@ def printMovie(movie):
         try:
             searchImbd(movie['original_title'],movie['year'])
         except Exception as e :
-            print("暂无评分\n")
+            print("Imdb 暂无评分\n")
         print("类型:  ",end = "")
         printList(movie['genres'])
         print("\n")
